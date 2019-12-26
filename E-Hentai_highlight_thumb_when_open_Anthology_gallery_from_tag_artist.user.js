@@ -5,7 +5,7 @@
 // @description E-Hentai 高亮缩图当打开Anthology gallery时来自tag:artist
 // @include     https://exhentai.org/g/*
 // @include     https://e-hentai.org/g/*
-// @version     1.0
+// @version     1.1
 // @run-at      document-start
 // @author      zhuzemin
 // @license     Mozilla Public License 2.0; http://www.mozilla.org/MPL/2.0/
@@ -22,11 +22,9 @@ var debug = config.debug ? console.log.bind(console)  : function () {
 var GetArtistStartImg = function() {
 	debug("Start: GetArtistStartImg");
 	if(document.referrer.includes("/tag/artist:")||window.location.href.includes("#/tag/artist:")){
-		debug("here");
-    var title=document.querySelector("#gn").textContent;
+		var title=document.querySelector("#gn").textContent;
 		debug("Title: "+title);
-		if(title.includes("Anthology")||(title.includes("COMIC")&&title.match(/\d{4}-\d{2}/)!=null)){
-      debug("here");
+		if(title.includes("Anthology")||(title.match(/^COMIC/)!=null&&title.match(/\d{4}-\d{2}/)!=null)){
       var artist;
       try{
         artist=document.referrer.match(/\/tag\/artist:([\d\w\+]*)/)[1].replace("+"," ");
@@ -128,7 +126,13 @@ init=function(){
      
   var ObjectCurrentPageTotalImg=GetCurrentPageTotalImg();
   var CurrentPageTotalImg=ObjectCurrentPageTotalImg.CurrentPageTotalImg;
-    var ArtistStartImgInCurrentPage=ArtistStartImg%CurrentPageTotalImg-1;
+    var ArtistStartImgInCurrentPage=ArtistStartImg%CurrentPageTotalImg;
+    if(ArtistStartImgInCurrentPage==0){
+      ArtistStartImgInCurrentPage=CurrentPageTotalImg-1;
+    }
+    else{
+      ArtistStartImgInCurrentPage-=1;
+    }
     debug("ArtistStartImgInCurrentPage: "+ArtistStartImgInCurrentPage);
     if(window.location.href.includes("#/tag/artist:")){
       ArtistStartImg=ArtistStartImgInCurrentPage;
@@ -151,20 +155,3 @@ init=function(){
 }
 
 window.addEventListener('DOMContentLoaded', init);
-
-/*
-Exception: Error while performing task "pretty-print": Error: Unexpected character '`' (20:12)
-[4]</pp.raise@resource://devtools/shared/acorn/acorn.js:940:13
-[13]</pp.getTokenFromCode@resource://devtools/shared/acorn/acorn.js:2785:3
-[13]</pp.readToken@resource://devtools/shared/acorn/acorn.js:2490:10
-[13]</pp.nextToken@resource://devtools/shared/acorn/acorn.js:2482:66
-[13]</pp.next@resource://devtools/shared/acorn/acorn.js:2431:3
-[13]</pp.getToken@resource://devtools/shared/acorn/acorn.js:2435:3
-prettyFast@resource://devtools/shared/pretty-fast/pretty-fast.js:778:15
-@resource://devtools/server/actors/pretty-print-worker.js:41:24
-createHandler/<@resource://devtools/shared/worker/helper.js:85:24
-
-@resource://devtools/server/actors/pretty-print-worker.js:51:12
-createHandler/<@resource://devtools/shared/worker/helper.js:85:24
-
-*/
