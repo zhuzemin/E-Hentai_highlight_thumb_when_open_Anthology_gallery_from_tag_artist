@@ -5,7 +5,7 @@
 // @description E-Hentai 高亮缩图当打开Anthology gallery时来自tag:artist
 // @include     https://exhentai.org/g/*
 // @include     https://e-hentai.org/g/*
-// @version     1.2
+// @version     1.3
 // @run-at      document-start
 // @author      zhuzemin
 // @license     Mozilla Public License 2.0; http://www.mozilla.org/MPL/2.0/
@@ -24,7 +24,7 @@ var GetArtistStartImg = function() {
 	if(document.referrer.includes("/tag/artist:")||window.location.href.includes("#/tag/artist:")){
 		var title=document.querySelector("#gn").textContent;
 		debug("Title: "+title);
-		if(title.includes("Anthology")||(title.match(/^COMIC/)!=null/*&&title.match(/\d{4}-\d{2}/)!=null*/)){
+		if(title.toLowerCase().includes("anthology")||(title.toLowerCase().match(/^comic/)!=null/*&&title.match(/\d{4}-\d{2}/)!=null*/)){
       var artist;
       try{
         artist=document.referrer.match(/\/tag\/artist:([\d\w\+]*)/)[1].replace("+"," ");
