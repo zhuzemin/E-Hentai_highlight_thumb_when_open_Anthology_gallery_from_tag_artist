@@ -1,8 +1,14 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name        E-Hentai / nHentai highlight thumb when open Anthology gallery
+// @name:zh-CN        E-Hentai / nHentai highlight thumb when open Anthology gallery
+// @name:zh-TW        E-Hentai / nHentai highlight thumb when open Anthology gallery
+// @name:ja        E-Hentai / nHentai highlight thumb when open Anthology gallery
 // @namespace   E-Hentai_highlight_thumb_when_open_Anthology_gallery_from_tag_artist
 // @supportURL  https://github.com/zhuzemin
 // @description highlight and navigate to artist work first thumb when open "Anthology gallery" from search page with tag "artist"
+// @description:zh-CN highlight and navigate to artist work first thumb when open "Anthology gallery" from search page with tag "artist"
+// @description:zh-TW highlight and navigate to artist work first thumb when open "Anthology gallery" from search page with tag "artist"
+// @description:ja highlight and navigate to artist work first thumb when open "Anthology gallery" from search page with tag "artist"
 // @include     https://exhentai.org/g/*
 // @include     https://e-hentai.org/g/*
 // @include     https://nhentai.net/g/*
