@@ -16,6 +16,8 @@
 // @include     https://zh.nyahentai.co/g/*
 // @include     https://ja.nyahentai.net/g/*
 // @include     https://zh.nyahentai.pro/g/*
+// @include     https://ja.nyahentai.org/g/*
+// @include     https://zh.nyahentai4.com/g/*
 // @version     1.4
 // @run-at      document-start
 // @author      zhuzemin
