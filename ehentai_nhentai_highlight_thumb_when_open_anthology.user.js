@@ -18,7 +18,7 @@
 // @include     https://zh.nyahentai.pro/g/*
 // @include     https://ja.nyahentai.org/g/*
 // @include     https://zh.nyahentai4.com/g/*
-// @version     1.4
+// @version     1.41
 // @run-at      document-start
 // @author      zhuzemin
 // @license     Mozilla Public License 2.0; http://www.mozilla.org/MPL/2.0/
