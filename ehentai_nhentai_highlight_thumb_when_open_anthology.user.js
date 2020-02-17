@@ -307,7 +307,7 @@ window.addEventListener('DOMContentLoaded', init);
 
 function SearchGallery(responseDetails) {
     var responseText=responseDetails.responseText;
-    if(responseText.length<200||responseDetails.finalUrl.includes('.workers.dev')){
+    if(responseText.length<200||!responseDetails.finalUrl.includes('.workers.dev')){
         request(cloudflare,SearchGallery);
         return;
     }
