@@ -18,7 +18,7 @@
 // @include     https://zh.nyahentai.pro/g/*
 // @include     https://ja.nyahentai.org/g/*
 // @include     https://zh.nyahentai4.com/g/*
-// @version     1.41
+// @version     1.42
 // @run-at      document-start
 // @author      zhuzemin
 // @license     Mozilla Public License 2.0; http://www.mozilla.org/MPL/2.0/
@@ -307,11 +307,11 @@ window.addEventListener('DOMContentLoaded', init);
 
 function SearchGallery(responseDetails) {
     var responseText=responseDetails.responseText;
-    if(responseText.length<200||!responseDetails.finalUrl.includes('.workers.dev')){
+    if(responseText!=null&&responseText.length<200||!responseDetails.finalUrl.includes('.workers.dev')){
         request(cloudflare,SearchGallery);
         return;
     }
-    else if(responseText.length<200&&responseDetails.finalUrl.includes('.workers.dev')){
+    else if(responseText!=null&&responseText.length<200&&responseDetails.finalUrl.includes('.workers.dev')){
         request(e_hentai,SearchGallery);
         return;
 
@@ -354,7 +354,6 @@ function GetComments(responseDetails) {
     searchStatus=1;
 }
 function request(object,func) {
-    var retries = 3;
     GM_xmlhttpRequest({
         method: object.method,
         url: object.url,
@@ -363,24 +362,12 @@ function request(object,func) {
         timeout: 60000,
         //synchronous: true
         onload: function (responseDetails) {
-            if (responseDetails.status != 200) {
-                // retry
-                if (retries--) {          // *** Recurse if we still have retries
-                    setTimeout(request(),2000);
-                    return;
-                }
-            }
             debug(responseDetails);
             //Dowork
             func(responseDetails);
         },
         ontimeout: function (responseDetails) {
             debug(responseDetails);
-            // retry
-            if (retries--) {          // *** Recurse if we still have retries
-                setTimeout(request,2000);
-                return;
-            }
             //Dowork
             func(responseDetails);
 

@@ -1,7 +1,8 @@
 # E-Hentai_highlight_thumb_when_open_Anthology_gallery_from_tag_artist
 
+Compatibility:
 Firefox/Chrome,
-Greasemonkey/Tampermonkey
+Tampermonkey <--- !!!Attention: Greasemonkey 4 was not support!
 
 e-hentai.org / nhentai.net highlight and navigate to artist work first thumb when open "Anthology gallery" from search page with tag "artist"
 
