@@ -18,7 +18,7 @@
 // @include     https://zh.nyahentai.pro/g/*
 // @include     https://ja.nyahentai.org/g/*
 // @include     https://zh.nyahentai4.com/g/*
-// @version     1.42
+// @version     1.43
 // @run-at      document-start
 // @author      zhuzemin
 // @license     Mozilla Public License 2.0; http://www.mozilla.org/MPL/2.0/
@@ -32,19 +32,19 @@
 // @connect-src proud-surf-e590.zhuzemin.workers.dev
 // ==/UserScript==
 var config = {
-  'debug': false
+    'debug': false
 }
-var debug = config.debug ? console.log.bind(console)  : function () {
+var debug = config.debug ? console.log.bind(console) : function () {
 };
 
 //for avoid exhentai login require
-var cloudFlareUrl='https://proud-surf-e590.zhuzemin.workers.dev/ajax/';
+var cloudFlareUrl = 'https://proud-surf-e590.zhuzemin.workers.dev/ajax/';
 
-var searchStatus=0;
-class E_hentai{
+var searchStatus = 0;
+class E_hentai {
     constructor(keyword) {
         this.method = 'GET';
-        this.url = "https://e-hentai.org/?f_search="+keyword;
+        this.url = "https://e-hentai.org/?f_search=" + keyword;
         this.headers = {
             'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey',
             'Accept': 'application/atom+xml,application/xml,text/xml',
@@ -53,10 +53,10 @@ class E_hentai{
         this.charset = 'text/plain;charset=utf8';
     }
 }
-class Exhentai{
+class Exhentai {
     constructor(keyword) {
         this.method = 'GET';
-        this.url = "https://exhentai.org/?f_search="+keyword;
+        this.url = "https://exhentai.org/?f_search=" + keyword;
         this.headers = {
             'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey',
             'Accept': 'application/atom+xml,application/xml,text/xml',
@@ -65,10 +65,10 @@ class Exhentai{
         this.charset = 'text/plain;charset=utf8';
     }
 }
-class CloudFlare{
+class CloudFlare {
     constructor(keyword) {
         this.method = 'GET';
-        this.url = "https://proud-surf-e590.zhuzemin.workers.dev/ajax/https://exhentai.org/?f_search="+keyword;
+        this.url = "https://proud-surf-e590.zhuzemin.workers.dev/ajax/https://exhentai.org/?f_search=" + keyword;
         this.headers = {
             'User-agent': 'Mozilla/4.0 (compatible) Greasemonkey',
             'Accept': 'application/atom+xml,application/xml,text/xml',
@@ -78,7 +78,7 @@ class CloudFlare{
     }
 }
 
-class Gallery{
+class Gallery {
     constructor(href) {
         this.method = 'GET';
         this.url = href;
@@ -93,32 +93,32 @@ class Gallery{
 var exhentai;
 var e_hentai;
 
-var GetArtistStartImg = function() {
+var GetArtistStartImg = function () {
     debug("Start: GetArtistStartImg");
-    if (document.referrer.includes("/tag/artist:") || window.location.href.includes("#/tag/artist:")||document.referrer.includes("/artist/")) {
-      var taglist;
-      var links;
-      if(document.referrer.includes("/artist/")){
+    let object=null;
+    if (document.referrer.includes("/tag/artist:") || window.location.href.includes("#/tag/artist:") || document.referrer.includes("/artist/")) {
+        var taglist;
+        var links;
+        if (document.referrer.includes("/artist/")) {
 
-          taglist = document.querySelector('#tags');
-          links = taglist.querySelectorAll("a.tag");
-      }
-      else{
-          taglist = document.querySelector('#taglist');
-          links = taglist.querySelectorAll("a");
+            taglist = document.querySelector('#tags');
+            links = taglist.querySelectorAll("a.tag");
+        }
+        else {
+            taglist = document.querySelector('#taglist');
+            links = taglist.querySelectorAll("a");
 
-      }
+        }
         for (var link of links) {
             var tag = link.innerText;
-            if (tag .includes('anthology') ) {
+            if (tag.includes('anthology')) {
                 debug(tag);
                 /*var title=document.querySelector("#gn").textContent;
                 debug("Title: "+title);
                 if(title.toLowerCase().includes("anthology")||(title.toLowerCase().match(/^comic/)!=null)){*/
                 var artist;
-                if(document.referrer.includes("/artist/")){
+                if (document.referrer.includes("/artist/")) {
                     artist = document.referrer.match(/\/artist\/([\d\w\-]*)/)[1].replace("-", " ");
-
                 }
                 else {
                     try {
@@ -126,7 +126,6 @@ var GetArtistStartImg = function() {
                     } catch (e) {
                         artist = window.location.href.match(/\/tag\/artist:([\d\w\+]*)/)[1].replace("+", " ");
                     }
-
                 }
                 debug("Artist: " + artist);
                 var divs = document.querySelectorAll("div.c1");
@@ -152,66 +151,88 @@ var GetArtistStartImg = function() {
                             }
                           }
                         }*/
-                        var lines = comment.innerText.split("\n");
-                        debug(lines);
-                        for (var line of lines) {
-                            var line = line.toLowerCase();
-                            if (line.includes(artist)) {
-                                var array = line.match(/(\d{1,4})/);
-                                debug(array);
-                                if (array != null) {
-                                    var ArtistStartImg = parseInt(array[1]);
-                                    debug("ArtistStartImg: " + ArtistStartImg);
-                                    var object = {
-                                        "ArtistStartImg": ArtistStartImg,
-                                        "artist": artist
+                        let ArtistStartImg=null;
+                        if (comment.innerHTML.toLowerCase().includes('https://')){
+                            let names=comment.innerText.split("…");
+                            let count=0;
+                            for(let name of names){
+                                if(name.match(/\w+/)!=null){
+                                    debug('name: '+name);
+                                    if(name.toLowerCase().includes(artist)){
+                                        debug('count: '+count);
+                                        break;
                                     }
-                                    return object;
+                                    count++;
                                 }
                             }
+                            let urls=comment.querySelectorAll('a');
+                            let artistUrl=urls[count];
+                            debug('artistUrl: '+artistUrl);
+                            ArtistStartImg = artistUrl.href.match(/\d*-(\d{1,4})/)[1];
                         }
+                        else{
+                            var lines = comment.innerText.split("\n");
+                            debug(lines);
+                            for (var line of lines) {
+                                var line = line.toLowerCase();
+                                if (line.includes(artist)) {
+                                    var array = line.match(/(\d{1,4})/);
+                                    debug(array);
+                                    if (array != null) {
+                                        ArtistStartImg = parseInt(array[1]);
+                                    }
+                                }
+                            }                        
+                        }
+                        debug("ArtistStartImg: " + ArtistStartImg);
+                        object = {
+                            "ArtistStartImg": ArtistStartImg,
+                            "artist": artist
+                        }
+                        break;
                     }
                 }
                 break;
             }
             else if (link == links[links.length - 1]) {
                 debug("End: GetArtistStartImg");
-                return null;
+                break;
             }
         }
     }
+    return object;
 }
 
 
-GetCurrentPageTotalImg=function(){
-	debug("Start: GetCurrentPageTotalImg");
+GetCurrentPageTotalImg = function () {
+    debug("Start: GetCurrentPageTotalImg");
     var divs;
-	if(document.referrer.includes("/artist/")){
-        divs=document.querySelectorAll("div.thumb-container");
+    if (document.referrer.includes("/artist/")) {
+        divs = document.querySelectorAll("div.thumb-container");
     }
     else {
 
-        divs=document.querySelectorAll("div.gdtl");
+        divs = document.querySelectorAll("div.gdtl");
     }
-  debug(divs);
-  if(divs!=null){
-    var CurrentPageTotalImg=divs.length;
-    debug("CurrentPageTotalImg: "+CurrentPageTotalImg);
-    var object={
-      "CurrentPageTotalImg":CurrentPageTotalImg,
-      "divs":divs
+    debug(divs);
+    if (divs != null) {
+        var CurrentPageTotalImg = divs.length;
+        debug("CurrentPageTotalImg: " + CurrentPageTotalImg);
+        var object = {
+            "CurrentPageTotalImg": CurrentPageTotalImg,
+            "divs": divs
+        }
+        return object;
     }
-    return object;
-  }
-	debug("End: GetCurrentPageTotalImg");
-  return null;
+    debug("End: GetCurrentPageTotalImg");
+    return null;
 }
 
-CreateStyle=function(){
-  debug("Start: CreateStyle");
-  var style=document.createElement("style");
-  style.setAttribute("type","text/css");
-  style.innerHTML=`
+CreateStyle = function () {
+    debug("Start: CreateStyle");
+    var style = document.createElement("style");
+    style.setAttribute("type", "text/css");
+    style.innerHTML = `
 .glowbox {
      background: #4c4c4c; 
     //width: 400px;
@@ -222,138 +243,136 @@ CreateStyle=function(){
     box-shadow: 0 0 5px 5px #FFFF00;
 }
 `;
-  debug("Processing: CreateStyle");
-  var head=document.querySelector("head");
-  head.insertBefore(style,null);
-  debug("End: CreateStyle");
+    debug("Processing: CreateStyle");
+    var head = document.querySelector("head");
+    head.insertBefore(style, null);
+    debug("End: CreateStyle");
 }
 
-init=function(){
+init = function () {
     debug("init");
     //nhentai
-  if(!/(https:\/\/e(-|x)hentai\.org\/g\/[\d\w]*\/[\d\w]*\/)/.test(window.location.href)){
-      debug("nhentai");
+    if (!/(https:\/\/e(-|x)hentai\.org\/g\/[\d\w]*\/[\d\w]*\/)/.test(window.location.href)) {
+        debug("nhentai");
+        var info = document.querySelector('#info');
+        var title;
+        try {
+            title = info.querySelector("h2").innerText;
 
-
-      var info = document.querySelector('#info');
-      var title;
-      try{
-          title=info.querySelector("h2").innerText;
-
-      }
-      catch (e) {
-          title=info.querySelector("h1").innerText;
-      }
-      title=encodeURIComponent('"'+title.replace(' ','+')+'"');
-      exhentai=new Exhentai(title);
-      e_hentai=new E_hentai(title);
-      cloudflare=new CloudFlare(title);
-      request(exhentai,SearchGallery);
-  }
-  var interval=setInterval(function () {
-      var cdiv=document.querySelector('#cdiv');
-      if(cdiv!=null||searchStatus!=0){
-        clearInterval(interval);
-          if(cdiv!=null){
-              var ObjectArtistStartImg=GetArtistStartImg();
-              var ArtistStartImg=ObjectArtistStartImg.ArtistStartImg;
-              if(ArtistStartImg!=null){
-    var ObjectCurrentPageTotalImg=GetCurrentPageTotalImg();
-    var CurrentPageTotalImg=ObjectCurrentPageTotalImg.CurrentPageTotalImg;
-    var ArtistStartImgInCurrentPage=ArtistStartImg%CurrentPageTotalImg;
-    if(ArtistStartImgInCurrentPage==0){
-        ArtistStartImgInCurrentPage=CurrentPageTotalImg-1;
+        }
+        catch (e) {
+            title = info.querySelector("h1").innerText;
+        }
+        title = encodeURIComponent('"' + title.replace(' ', '+') + '"');
+        exhentai = new Exhentai(title);
+        e_hentai = new E_hentai(title);
+        cloudflare = new CloudFlare(title);
+        request(exhentai, SearchGallery);
     }
-    else{
-        ArtistStartImgInCurrentPage-=1;
-    }
-    debug("ArtistStartImgInCurrentPage: "+ArtistStartImgInCurrentPage);
-    //e-hentai
-        if(!document.referrer.includes("/artist/")){
-    if(window.location.href.includes("#/tag/artist:")){
-        ArtistStartImg=ArtistStartImgInCurrentPage;
-    }
-    var CorrectPage;
-    if(ArtistStartImg==0){
-        CorrectPage=0;
-    }
-    else{
-        CorrectPage=Math.ceil(ArtistStartImg/CurrentPageTotalImg)-1;
-    }
-    debug("CorrectPage: "+CorrectPage);
-    if(CorrectPage!=0){
-      window.location.href+="?p="+CorrectPage+"#/tag/artist:"+ObjectArtistStartImg.artist;
+    var interval = setInterval(function () {
+        var cdiv = document.querySelector('#cdiv');
+        if (cdiv != null || searchStatus != 0) {
+            clearInterval(interval);
+            if (cdiv != null) {
+                var ObjectArtistStartImg = GetArtistStartImg();
+                var ArtistStartImg = ObjectArtistStartImg.ArtistStartImg;
+                if (ArtistStartImg != null) {
+                    var ObjectCurrentPageTotalImg = GetCurrentPageTotalImg();
+                    var CurrentPageTotalImg = ObjectCurrentPageTotalImg.CurrentPageTotalImg;
+                    var ArtistStartImgInCurrentPage = ArtistStartImg % CurrentPageTotalImg;
+                    if (ArtistStartImgInCurrentPage == 0) {
+                        ArtistStartImgInCurrentPage = CurrentPageTotalImg - 1;
+                    }
+                    else {
+                        ArtistStartImgInCurrentPage -= 1;
+                    }
+                    debug("ArtistStartImgInCurrentPage: " + ArtistStartImgInCurrentPage);
+                    //e-hentai
+                    if (!document.referrer.includes("/artist/")) {
+                        if (window.location.href.includes("#/tag/artist:")) {
+                            ArtistStartImg = ArtistStartImgInCurrentPage;
+                        }
+                        var CorrectPage;
+                        if (ArtistStartImg == 0) {
+                            CorrectPage = 0;
+                        }
+                        else {
+                            CorrectPage = Math.ceil(ArtistStartImg / CurrentPageTotalImg) - 1;
+                        }
+                        debug("CorrectPage: " + CorrectPage);
+                        if (CorrectPage != 0) {
+                            window.location.href += "?p=" + CorrectPage + "#/tag/artist:" + ObjectArtistStartImg.artist;
 
-    }
+                        }
 
-}
-                  CreateStyle();
-                  var div=ObjectCurrentPageTotalImg.divs[ArtistStartImgInCurrentPage];
-                  var img=div.querySelector("img");
-                  img.className +=" glowbox";
-                  debug(div);
-                  div.scrollIntoView();
+                    }
+                    CreateStyle();
+                    var div = ObjectCurrentPageTotalImg.divs[ArtistStartImgInCurrentPage];
+                    var img = div.querySelector("img");
+                    img.className += " glowbox";
+                    debug(div);
+                    div.scrollIntoView();
 
-              }
+                }
 
-      }
+            }
 
-      }
-  },2000);
+        }
+    }, 2000);
 }
 
 window.addEventListener('DOMContentLoaded', init);
 
 
 function SearchGallery(responseDetails) {
-    var responseText=responseDetails.responseText;
-    if(responseText!=null&&responseText.length<200||!responseDetails.finalUrl.includes('.workers.dev')){
-        request(cloudflare,SearchGallery);
+    var responseText = responseDetails.responseText;
+    if (responseText != null && responseText.length < 200 || !responseDetails.finalUrl.includes('.workers.dev')) {
+        request(cloudflare, SearchGallery);
         return;
     }
-    else if(responseText!=null&&responseText.length<200&&responseDetails.finalUrl.includes('.workers.dev')){
-        request(e_hentai,SearchGallery);
+    else if (responseText != null && responseText.length < 200 && responseDetails.finalUrl.includes('.workers.dev')) {
+        request(e_hentai, SearchGallery);
         return;
 
     }
-    var href=responseText.match(/(https:\/\/e(-|x)hentai\.org\/g\/[\d\w]*\/[\d\w]*\/)/)[1];
-    debug("href: "+href);
-    if(href!=null){
+    var href = responseText.match(/(https:\/\/e(-|x)hentai\.org\/g\/[\d\w]*\/[\d\w]*\/)/)[1];
+    debug("href: " + href);
+    if (href != null) {
         /*var dom = new DOMParser().parseFromString(responseText, "text/html");
         var div = dom.getElementsByClassName('itg')[0];
         var href = div.querySelector('a').href;*/
         var url;
-        if(responseDetails.finalUrl.includes('.workers.dev')){
-          url=cloudFlareUrl+href;
+        if (responseDetails.finalUrl.includes('.workers.dev')) {
+            url = cloudFlareUrl + href;
         }
         else {
-          url=href;
+            url = href;
         }
         var gallery = new Gallery(url);
         debug("SearchGallery");
-        request(gallery,GetComments);
+        request(gallery, GetComments);
     }
-    else{
-      searchStatus=2;
+    else {
+        searchStatus = 2;
     }
 }
 
 function GetComments(responseDetails) {
-    var responseText=responseDetails.responseText;
+    var responseText = responseDetails.responseText;
     var dom = new DOMParser().parseFromString(responseText, "text/html");
-    var comments=dom.querySelector("#cdiv");
-    comments.style.color="#34495e";
-    var content=document.querySelector("#content");
-    var related=content.querySelector("#related-container");
+    var comments = dom.querySelector("#cdiv");
+    comments.style.color = "#34495e";
+    var content = document.querySelector("#content");
+    var related = content.querySelector("#related-container");
     debug("GetComments");
-    content.insertBefore(comments,related);
-    var link=document.createElement("link");
-    link.innerHTML=`<link rel="stylesheet" type="text/css" href="https://e-hentai.org/z/0347/g.css">`;
-    var head=document.querySelector("head");
-    head.insertBefore(link,null);
-    searchStatus=1;
+    content.insertBefore(comments, related);
+    var link = document.createElement("link");
+    link.innerHTML = `<link rel="stylesheet" type="text/css" href="https://e-hentai.org/z/0347/g.css">`;
+    var head = document.querySelector("head");
+    head.insertBefore(link, null);
+    searchStatus = 1;
 }
-function request(object,func) {
+function request(object, func) {
     GM_xmlhttpRequest({
         method: object.method,
         url: object.url,
